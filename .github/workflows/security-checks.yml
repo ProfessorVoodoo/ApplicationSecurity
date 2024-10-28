@@ -4,9 +4,9 @@ name: Security Checks
 # Defines when the action will run
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   security:
@@ -22,7 +22,7 @@ jobs:
         uses: trufflesecurity/trufflehog-actions-scan@master
         with:
           path: ./
-          base: main
+          base: master
           head: HEAD
 
       # WHAT: Dependency scanning (if you're using Node.js)
