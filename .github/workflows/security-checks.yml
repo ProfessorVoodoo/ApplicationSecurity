@@ -12,10 +12,12 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      # Check out your repository
+      # WHAT: Check out your repository
+      # WHY: Required for any workflow that needs to access repo files	
       - uses: actions/checkout@v2
 
-      # Scan for secrets accidentally committed
+      # WHAT: Scan for secrets accidentally committed
+      # WHY: Prevents sensitive info from being exposed in repo(exposed secrets=breaches)
       - name: TruffleHog Security Scan
         uses: trufflesecurity/trufflehog-actions-scan@master
         with:
@@ -23,7 +25,8 @@ jobs:
           base: main
           head: HEAD
 
-      # Dependency scanning (if you're using Node.js)
+      # WHAT: Dependency scanning (if you're using Node.js)
+      # WHY: Required if running npm commands or node.js security tools
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
@@ -32,5 +35,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
+      # WHAT: Checks dependencies for known vulnerabilities
+      # WHY: Ensures you're not using packages with known security issues
       - name: Run npm audit
         run: npm audit
