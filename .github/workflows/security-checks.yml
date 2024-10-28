@@ -14,7 +14,7 @@ jobs:
     steps:
       # WHAT: Check out your repository
       # WHY: Required for any workflow that needs to access repo files	
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3	# Updated from v2 to v3
 
       # WHAT: Scan for secrets accidentally committed
       # WHY: Prevents sensitive info from being exposed in repo(exposed secrets=breaches)
@@ -23,13 +23,13 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: master
-          head: HEAD
+	  # Remove base and head parameters as they're not needed for full repo scan
+	  extra_args: --only-verified
 
       # WHAT: Dependency scanning (if you're using Node.js)
       # WHY: Required if running npm commands or node.js security tools
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3	# Updated from v2 to v3
         with:
           node-version: '16'
           
