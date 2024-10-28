@@ -18,8 +18,9 @@ jobs:
 
       # WHAT: Scan for secrets accidentally committed
       # WHY: Prevents sensitive info from being exposed in repo(exposed secrets=breaches)
-      - name: TruffleHog Security Scan
-        uses: trufflesecurity/trufflehog-actions-scan@master
+      # Updated TruffleHog action
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
         with:
           path: ./
           base: master
