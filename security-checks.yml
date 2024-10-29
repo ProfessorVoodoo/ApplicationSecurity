@@ -2,94 +2,94 @@ name: Security Checks
 
 on:
   push:
-    branches: [ main ]
+    branches: [master]
   pull_request:
-    branches: [ main ]
+    branches: [master]
 
 jobs:
   security:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: |
-        if [ -f package.json ]; then
-          npm ci
-        else
-          echo "No package.json found, skipping npm install"
-        fi
-        
-    - name: Run npm audit
-      if: hashFiles('package.json') != ''
-      run: npm audit
-      continue-on-error: true  # Don't fail the whole workflow if audit finds issues
-      
-    - name: Run OWASP Dependency Check
-      uses: dependency-check/Dependency-Check_Action@v2.9.0
-      with:
-        project: 'security-learning'
-        path: '.'
-        format: 'HTML'
-        args: >
-          --failOnCVSS 7
-          --enableRetired
-        
-    - name: Check for sensitive data
-      uses: gitleaks/gitleaks-action@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-    - name: Install and Run ESLint security rules
-      if: hashFiles('package.json') != ''
-      run: |
-        if [ ! -f .eslintrc.js ]; then
-          echo "Creating default ESLint security config..."
-          npm install --save-dev eslint @typescript-eslint/parser eslint-plugin-security
-          cat > .eslintrc.js << 'EOF'
-          module.exports = {
-            env: {
-              node: true,
-              es2021: true
-            },
-            extends: [
-              'eslint:recommended',
-              'plugin:security/recommended'
-            ],
-            plugins: [
-              'security'
-            ],
-            parserOptions: {
-              ecmaVersion: 2021
-            },
-            rules: {
-              'security/detect-eval-with-expression': 'error',
-              'security/detect-non-literal-require': 'error',
-              'security/detect-possible-timing-attacks': 'error',
-              'security/detect-no-csrf-before-method-override': 'error',
-              'security/detect-buffer-noassert': 'error',
-              'security/detect-child-process': 'error',
-              'security/detect-disable-mustache-escape': 'error',
-              'security/detect-new-buffer': 'error',
-              'security/detect-object-injection': 'error',
-              'security/detect-unsafe-regex': 'error',
-              'security/detect-pseudoRandomBytes': 'error'
-            }
-          };
-          EOF
-        fi
-        npx eslint . --config .eslintrc.js || true
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
-    - name: Upload Dependency Check Report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: dependency-check-report
-        path: reports/dependency-check-report.html
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          else
+            echo "No package.json found, skipping npm install"
+          fi
+
+      - name: Run npm audit
+        if: hashFiles('package.json') != ''
+        run: npm audit
+        continue-on-error: true # Don't fail the whole workflow if audit finds issues
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@v2.9.0
+        with:
+          project: "security-learning"
+          path: "."
+          format: "HTML"
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+
+      - name: Check for sensitive data
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install and Run ESLint security rules
+        if: hashFiles('package.json') != ''
+        run: |
+          if [ ! -f .eslintrc.js ]; then
+            echo "Creating default ESLint security config..."
+            npm install --save-dev eslint @typescript-eslint/parser eslint-plugin-security
+            cat > .eslintrc.js << 'EOF'
+            module.exports = {
+              env: {
+                node: true,
+                es2021: true
+              },
+              extends: [
+                'eslint:recommended',
+                'plugin:security/recommended'
+              ],
+              plugins: [
+                'security'
+              ],
+              parserOptions: {
+                ecmaVersion: 2021
+              },
+              rules: {
+                'security/detect-eval-with-expression': 'error',
+                'security/detect-non-literal-require': 'error',
+                'security/detect-possible-timing-attacks': 'error',
+                'security/detect-no-csrf-before-method-override': 'error',
+                'security/detect-buffer-noassert': 'error',
+                'security/detect-child-process': 'error',
+                'security/detect-disable-mustache-escape': 'error',
+                'security/detect-new-buffer': 'error',
+                'security/detect-object-injection': 'error',
+                'security/detect-unsafe-regex': 'error',
+                'security/detect-pseudoRandomBytes': 'error'
+              }
+            };
+            EOF
+          fi
+          npx eslint . --config .eslintrc.js || true
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: reports/dependency-check-report.html
